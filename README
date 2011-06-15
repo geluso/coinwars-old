@@ -1,0 +1,28 @@
+This is intended to be a simulation of coin wars. Development will
+be divided between a web-based version and a dedicated Android app.
+
+-------------------------------
+06/15/2011 - Dawn of the Nickel
+-------------------------------
+Version 1! Creating initial physics. In this version you may launch
+one nickel across the screen. Best yet: you can adjust several
+simulation parameters!
+
+New Features
+------------
+- one nickel
+- the nickel moves in a straight line
+- adjustable framerate, speed and acceleration
+
+Todo
+----
+- Implement realistic physics; including friction and acceleration.
+- Make the nickel a circle instead of a square
+  - alternatively: advocate for changing actual nickels to squares.
+- Add intro music.
+- Add interactive mouse control.
+- Implement trajectories.
+- Implement simultaneous, multi-coin movement.
+- Add pennies, quarters, dimes.
+  - Include realistic weights and measurements.
+- Add "fell off table" detection.
