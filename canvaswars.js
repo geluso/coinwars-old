@@ -1,3 +1,19 @@
+function createImage(src) {
+  var img = new Image();
+  img.src = src; 
+  return img; 
+}
+
+var IMAGES = {};
+var coins = ["sacagawea", "quarter", "dime", "nickel", "penny"];
+
+_.each(coins, function(coin) {
+  var heads = coin + "_heads";
+  var tails = coin + "_tails";
+  IMAGES[heads] = createImage("img/" + heads + ".png");
+  IMAGES[tails] = createImage("img/" + tails + ".png");
+});
+
 // Dimensions
 var WIDTH = 800;
 var HEIGHT = 400;
@@ -54,7 +70,7 @@ Table.prototype.contains = function(x, y, size) {
       y > this.y && y < this.y + this.height;
 }
 
-function Coin(x, y, size, weight, color, team) {
+function Coin(x, y, size, weight, color, coin, team) {
   this.id = ID++;
   this.x = x;
   this.y = y;
@@ -64,11 +80,13 @@ function Coin(x, y, size, weight, color, team) {
   this.size = size;
   this.weight = weight;
   this.color = color;
+  this.coin = coin;
   this.team = team;
   this.selected = false;
 }
 
-function construct_coin(coin, x, y, size, weight, color, team) {
+function construct_coin(coin, x, y, size, weight, color, coin, team) {
+  debugger
   coin.id = ID++;
   coin.x = x;
   coin.y = y;
@@ -78,28 +96,26 @@ function construct_coin(coin, x, y, size, weight, color, team) {
   coin.size = size;
   coin.weight = weight;
   coin.color = color;
+  coin.coin = coin;
   coin.team = team;
   coin.selected = false;
 }
 
-//function Quarter(x, y, team) {
-  //this(x, y, 24, 5.67, GRAY, team); 
-//}
-
-Quarter = function(x, y, team) {
-  construct_coin(this, x, y, 24, 5.67, GRAY, team);
+Quarter = function(x, y, coin, team) {
+  debugger
+  construct_coin(this, x, y, 24, 5.67, GRAY, coin, team);
 };
 
-Dime = function(x, y, team) {
-  construct_coin(this, x, y, 18, 2.268, GRAY, team);
+Dime = function(x, y, coin, team) {
+  construct_coin(this, x, y, 18, 2.268, GRAY, coin, team);
 };
 
-Nickel = function(x, y, team) {
-  construct_coin(this, x, y, 21, 5, GRAY, team);
+Nickel = function(x, y, coin, team) {
+  construct_coin(this, x, y, 21, 5, GRAY, coin, team);
 };
 
-Penny = function(x, y, team) {
-  construct_coin(this, x, y, 19, 2.5, BROWN, team);
+Penny = function(x, y, coin, team) {
+  construct_coin(this, x, y, 19, 2.5, BROWN, coin, team);
 };
 
 Quarter.prototype = new Coin();
@@ -112,9 +128,14 @@ Coin.prototype.toString = function() {
 }
 
 Coin.prototype.draw = function(ctx) {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2, true); 
-    ctx.closePath();
+    var filename = this.coin + "_" + this.team;
+    var img = IMAGES[filename];
+
+    if(!img) {
+      return;
+    }
+
+    ctx.drawImage(img, this.x, this.y, this.size, this.size); 
 
     if (this.inactive) { 
       ctx.fillStyle = BLACK
@@ -164,10 +185,10 @@ Coin.prototype.update = function() {
 
   this.ax *= DECAY;
   this.ay *= DECAY;
-  if (Math.abs(this.ax) < 1) {
+  if (Math.abs(this.ax) < .001) {
     this.ax = 0;
   }
-  if (Math.abs(this.ay) < 1) {
+  if (Math.abs(this.ay) < .001) {
     this.ay = 0;
   }
   this.x += this.ax;
@@ -297,19 +318,19 @@ function init() {
   canvas.height = document.height;
 
   TABLE = new Table(WIDTH, HEIGHT);
-  COINS.push(new Quarter(50, 75, "H"));
-  COINS.push(new Quarter(50, 150, "H"));
-  COINS.push(new Quarter(50, 225, "H"));
-  COINS.push(new Quarter(50, 300, "H"));
-  COINS.push(new Dime(100, 175, "H"));
-  COINS.push(new Nickel(100, 250, "H"));
+  COINS.push(new Quarter(50, 75, "quarter", "heads"));
+  COINS.push(new Quarter(50, 150, "quarter", "heads"));
+  COINS.push(new Quarter(50, 225, "quarter", "heads"));
+  COINS.push(new Quarter(50, 300, "quarter", "heads"));
+  COINS.push(new Dime(100, 175, "dime", "heads"));
+  COINS.push(new Nickel(100, 250, "nickel", "heads"));
   
-  COINS.push(new Quarter(700, 75, "T"));
-  COINS.push(new Quarter(700, 150, "T"));
-  COINS.push(new Quarter(700, 225, "T"));
-  COINS.push(new Quarter(700, 300, "T"));
-  COINS.push(new Dime(650, 175, "T"));
-  COINS.push(new Nickel(650, 250, "T"));
+  COINS.push(new Quarter(700, 75, "quarter", "tails"));
+  COINS.push(new Quarter(700, 150, "quarter", "tails"));
+  COINS.push(new Quarter(700, 225, "quarter", "tails"));
+  COINS.push(new Quarter(700, 300, "quarter", "tails"));
+  COINS.push(new Dime(650, 175, "dime", "tails"));
+  COINS.push(new Nickel(650, 250, "nickel", "tails"));
 
   // if the browser support canvas
   if (document.getElementById("canvas").getContext) {
