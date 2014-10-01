@@ -1,7 +1,8 @@
 body {
- background-color: #dddddd;
+  background-color: #dddddd;
+  margin: 0;
 }
 
 canvas {
- background-color: white;
+  background-color: white;
 }
