@@ -4,7 +4,12 @@ var WIDTH = 1200;
 var HEIGHT = 600;
 
 function init() {
-  STAGE = new PIXI.Stage(0x66FF99);
+  var interactive = true;
+  STAGE = new PIXI.Stage(0x66FF99, interactive);
+
+  STAGE.mousedown = stagedown;
+  STAGE.mouseup = stageup;
+
   RENDERER = PIXI.autoDetectRenderer(WIDTH, HEIGHT);
   document.body.appendChild(RENDERER.view);
 
@@ -15,7 +20,21 @@ function init() {
 function animate() {
     requestAnimFrame(animate);
 
+    /*
+    var coin = _.sample(STAGE.children);
+    coin.position.x = _.random(0, WIDTH);
+    coin.position.y = _.random(0, HEIGHT);
+    */
+
     RENDERER.render(STAGE);
+}
+
+function stagedown(mouseData) {
+  console.log("stagedown");
+}
+
+function stageup(mouseData) {
+  console.log("stageup");
 }
 
 function createCoins() {
@@ -45,8 +64,17 @@ function createCoin(coin, team, x, y) {
   coin.anchor.y = 0.5;
 
   // move the sprite t the center of the screen
-  coin.position.x = x * WIDTH;
-  coin.position.y = y * HEIGHT;
+  coin.position.x = Math.floor((x * WIDTH) - coin.width / 2);
+  coin.position.y = Math.floor((y * HEIGHT) - coin.height / 2);
+
+  coin.setInteractive(true);
+  coin.mousedown = function(mouseData){
+     console.log("MOUSE DOWN!");
+  }
+   
+  coin.mouseup = function(mouseData){
+     console.log("MOUSE UP!");
+  }
 
   STAGE.addChild(coin);
 }
