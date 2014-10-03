@@ -25,8 +25,7 @@ function animate() {
       coin1.position.y += coin1._meta.ay;
 
       _.each(STAGE.children, function(coin2) {
-        if ((coin1 !== coin2) && collision(coin1, coin2)) {
-          console.log("collision");
+        if (collision(coin1, coin2)) {
           coin2._meta.ax = coin1._meta.ax;
           coin2._meta.ay = coin1._meta.ay;
 
@@ -50,11 +49,12 @@ function animate() {
 }
 
 function stagedown(mouseData) {
-  console.log("stagedown");
 }
 
 function stageup(mouseData) {
-  console.log("stageup");
+  if (!TURN) {
+    return;
+  }
 }
 
 function createCoins() {
@@ -94,21 +94,33 @@ function createCoin(type, team, x, y) {
   coin.position.y = Math.floor((y * HEIGHT) - coin.height / 2);
 
   coin.setInteractive(true);
+
   coin.mousedown = function(mouseData){
-     console.log("MOUSE DOWN!");
+     if (this._meta.immobilized) {
+       return;
+     }
+     TURN = true;
      this._meta.x0 = Math.round(mouseData.global.x);
      this._meta.y0 = Math.round(mouseData.global.y);
   }
    
   coin.mouseup = function(mouseData){
-     console.log("MOUSE UP!");
-     this._meta.x1 = Math.round(mouseData.global.x);
-     this._meta.y1 = Math.round(mouseData.global.y);
+    if (!TURN) {
+      return;
+    }
 
-     this._meta.ax = this._meta.x0 - this._meta.x1;
-     this._meta.ay = this._meta.y0 - this._meta.y1;
+    TURN = false;
+    _.each(STAGE.children, function(coin) {
+      coin._meta.immobilized = false;
+    });
 
-     this._meta.active = true;
+    this._meta.x1 = Math.round(mouseData.global.x);
+    this._meta.y1 = Math.round(mouseData.global.y);
+
+    this._meta.ax = this._meta.x0 - this._meta.x1;
+    this._meta.ay = this._meta.y0 - this._meta.y1;
+
+    this._meta.active = true;
   }
 
   STAGE.addChild(coin);
@@ -121,6 +133,11 @@ function distance(coin1, coin2) {
 }
 
 function collision(coin1, coin2) {
+  // coins don't collide with themselves.
+  if (coin1 === coin2) {
+    return false;
+  }
+
   var d = distance(coin1, coin2);
   var touching = (coin1.width / 2) + (coin2.width / 2);
   return d <= touching;
@@ -133,21 +150,56 @@ function stop(coin) {
 }
 
 function convert(coin1, coin2) {
-  var type = coin2._meta.type;
-  if (type === "general" || type === "dime") {
+  // only dimes convert
+  if (coin1._meta.type !== "dime") {
+    return; 
+  }
+
+  // the dime must be the active coin.
+  if (!coin1._meta.active) {
+    return; 
+  }
+  
+  // generals and dimes can't be converted.
+  if (coin2._meta.type === "general" || coin2._meta.type === "dime") {
     return;
   }
-  if (coin1._meta.active && coin1._meta.type === "dime") {
-    var filename = coin2._meta.type + "_" + coin1._meta.team + ".png";
-    var texture = PIXI.Texture.fromFrame("img/" + filename);
-    coin2._meta.team = coin2._meta.team;
-    coin2._meta.type = coin2._meta.type;
-    coin2.setTexture(texture);
+
+  // dimes don't converted their own pieces.
+  if (coin1._meta.team === coin2._meta.team) {
+    return;
   }
+
+  // ok, converted the coin!
+  var filename = coin2._meta.type + "_" + coin1._meta.team + ".png";
+  var texture = PIXI.Texture.fromFrame("img/" + filename);
+  coin2._meta.team = coin2._meta.team;
+  coin2._meta.type = coin2._meta.type;
+  coin2.setTexture(texture);
 }
 
 function immobilize(coin1, coin2) {
+  // the coin must be active.
+  if (!coin1._meta.active) {
+    return;
+  }
 
+  // only nickels immobilize
+  if (!coin1._meta.type === "nickel") {
+    return;
+  }
+
+  // they don't immobilize their own team.
+  if (isSameTeam(coin1, coin2)) {
+    return;
+  }
+
+  // ok, immobilize!
+  coin2._meta.immobilized = true;
+}
+
+function isSameTeam(coin1, coin2) {
+  return coin1._meta.team === coin2._meta.team;
 }
 
 $(document).ready(init);
