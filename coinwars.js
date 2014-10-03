@@ -185,7 +185,7 @@ function immobilize(coin1, coin2) {
   }
 
   // only nickels immobilize
-  if (!coin1._meta.type === "nickel") {
+  if (coin1._meta.type !== "nickel") {
     return;
   }
 
