@@ -1,7 +1,8 @@
 var STAGE;
 var RENDERER;
-var WIDTH = 1200;
-var HEIGHT = 600;
+var MARGIN = 50;
+var WIDTH = window.innerWidth - 2 * MARGIN;
+var HEIGHT = window.innerHeight - 2 * MARGIN;
 
 function init() {
   var interactive = true;
