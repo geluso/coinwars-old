@@ -74,6 +74,14 @@ function createCoins() {
   createCoin("nickel", "tails", 13/16, 3/9);
   createCoin("general", "tails", 13/16, 5/9);
   createCoin("dime", "tails", 13/16, 7/9);
+
+  var graphics = new PIXI.Graphics();
+  graphics.beginFill(0xFFFF00);
+  graphics.lineStyle(1, 0xFF0000);
+
+  graphics.drawRect(0, HEIGHT / 9, WIDTH, 1);
+
+  STAGE.addChild(graphics);
 }
 
 function createCoin(type, team, x, y) {
@@ -91,6 +99,7 @@ function createCoin(type, team, x, y) {
   coin.anchor.y = 0.5;
 
   // move the sprite t the center of the screen
+  console.log("position");
   coin.position.x = Math.floor((x * WIDTH) - coin.width / 2);
   coin.position.y = Math.floor((y * HEIGHT) - coin.height / 2);
 
